@@ -140,12 +140,13 @@ export class EmptyBuildingEntry extends BuildingEntry {
 export const hydrateBuildingTilesFromConfig =
   (config: any) =>
   <T extends BuildingEntry>(entry: new (...args: any[]) => T): T[] => {
-    const [result] = JSONPath({
-      // @ts-ignore
-      path: `$.category[?(@.name === '${entry.category}')].entry`,
-      json: config,
-      wrap: false,
-    });
+    const [result] =
+      JSONPath({
+        // @ts-ignore
+        path: `$.category[?(@.name === '${entry.category}')].entry`,
+        json: config,
+        wrap: false,
+      }) || [];
 
     if (!result?.length) {
       // @ts-ignore

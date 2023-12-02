@@ -1,3 +1,5 @@
+import os from "os";
+import path from "path";
 import * as fs from "fs";
 
 export type JSONValue =
@@ -39,11 +41,11 @@ export class TileDefinitions {
     fileName: string
   ): JSONValue[] {
     const folders = fs.readdirSync(rootFolder).filter((file) => {
-      return fs.statSync(rootFolder + "/" + file).isDirectory();
+      return fs.statSync(path.join(rootFolder, file)).isDirectory();
     });
 
     const definitionFilePaths = folders.flatMap((folder) => {
-      const furnitureFilePath = rootFolder + "/" + folder + "/" + fileName;
+      const furnitureFilePath = path.join(rootFolder, folder, fileName);
 
       if (fs.existsSync(furnitureFilePath)) {
         return [[furnitureFilePath, folder]];
@@ -66,7 +68,7 @@ export class TileDefinitions {
 
     const headers = data
       .slice(0, data.indexOf("{"))
-      .split("\n")
+      .split(os.EOL)
       .map((t) => t.trim())
       .filter((tag) => !metatags.some((t) => tag.includes(t)) && Boolean(tag));
 
@@ -94,7 +96,7 @@ export class TileDefinitions {
         return;
       }
 
-      const [_head, ...blocks] = data.split(head + "\n{");
+      const [_head, ...blocks] = data.split(head + `${os.EOL}{`);
 
       result[head] = blocks.map((chunk) => this.converter(chunk, false));
     });

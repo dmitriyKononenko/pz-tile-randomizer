@@ -5,12 +5,13 @@ import { app, BrowserWindow, ipcMain, protocol } from "electron";
 import { TileDefinitions } from "./utils/tile-definitions";
 
 const TILES_FOLDER_NAME = "tiles";
+const BASE_PATH =
+  process.env.NODE_ENV === "development"
+    ? app.getAppPath()
+    : process.resourcesPath;
 
 const setupDefaultTiles = () => {
-  const defaultTilesPath = path.join(
-    app.getAppPath(),
-    `./${TILES_FOLDER_NAME}`
-  );
+  const defaultTilesPath = path.join(BASE_PATH, `./${TILES_FOLDER_NAME}`);
 
   const userTilesPath = path.join(app.getPath("userData"), TILES_FOLDER_NAME);
 
@@ -28,11 +29,13 @@ const createWindow = () => {
   protocol.registerFileProtocol("tiles", (request, callback) => {
     const url = request.url.substr(8);
 
-    callback({ path: app.getPath("userData") + "/tiles/" + url });
+    callback({ path: path.join(app.getPath("userData"), "tiles", url) });
   });
 
   const tileDefinitions = new TileDefinitions();
-  tileDefinitions.loadTileDefinitions(app.getPath("userData") + "/tiles");
+  tileDefinitions.loadTileDefinitions(
+    path.join(app.getPath("userData"), "tiles")
+  );
 
   ipcMain.handle("get-definitions", () => ({
     buildingDefinitions: tileDefinitions.buildingDefinitions,

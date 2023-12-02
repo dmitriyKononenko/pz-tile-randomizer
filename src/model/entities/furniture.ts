@@ -135,12 +135,13 @@ export class EmptyFurniture extends Furniture {
 export const hydrateFurnitureTilesFromConfig =
   (config: any) =>
   <T extends Furniture>(entry: new (...args: any[]) => T): T[] => {
-    const [result] = JSONPath({
-      // @ts-ignore
-      path: `$.group[?(@.label === '${entry.label}')].furniture`,
-      json: config,
-      wrap: false,
-    });
+    const [result] =
+      JSONPath({
+        // @ts-ignore
+        path: `$.group[?(@.label === '${entry.label}')].furniture`,
+        json: config,
+        wrap: false,
+      }) || [];
 
     if (!result?.length) {
       // @ts-ignore
